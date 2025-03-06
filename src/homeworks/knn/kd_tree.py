@@ -17,22 +17,6 @@ class KDTree:
     def __init__(self, x: np.array, leaf_size: int) -> None:
         self.root = self._build_kd_tree(x.copy(), leaf_size)
 
-    def __str__(self) -> str:
-
-        def _make_str_recursively(node: Node | np.ndarray, depth: int = 0) -> str:
-            if isinstance(node, Node):
-                return f"""{"\t" * depth}med: {node.median};
-{"\t" * depth}split: {node.split_axis};
-{"\t" * depth}left subtree: (
-{_make_str_recursively(node.left_subtree, depth + 1) if node.left_subtree is not None else None}
-{"\t" * depth})
-{"\t" * depth}right subtree: (
-{_make_str_recursively(node.right_subtree, depth + 1) if node.right_subtree is not None else None}
-{"\t" * depth})"""
-            return f"{"\t" * depth}{str(node)}"
-
-        return _make_str_recursively(self.root)
-
     def _build_kd_tree(self, x: np.array, leaf_size: int) -> Node | np.ndarray:
         if len(x) <= leaf_size:
             return x
@@ -52,7 +36,7 @@ class KDTree:
     def query(self, x: np.ndarray, n_nearest: int = 1) -> np.ndarray:
 
         def _search_n_nearest(point: np.ndarray, node: Node | np.ndarray, n_nearest: int = 1) -> tuple[list, float]:
-            # if we reached leaf, then we return array of points, sorted by euclidian norm with needed target
+            # if we reached leaf, then we return array of points, sorted by euclidian norm with target
             if isinstance(node, np.ndarray):
                 res = [(elem, np.linalg.norm(point - elem)) for elem in node]
                 res.sort(key=lambda el: el[1])
@@ -77,3 +61,19 @@ class KDTree:
             return res1
 
         return np.array([np.array([neighbour[0] for neighbour in _search_n_nearest(point, self.root, n_nearest)[0]]) for point in x])
+
+    def __str__(self) -> str:
+
+        def _make_str_recursively(node: Node | np.ndarray, depth: int = 0) -> str:
+            if isinstance(node, Node):
+                return f"""{"\t" * depth}med: {node.median};
+{"\t" * depth}split: {node.split_axis};
+{"\t" * depth}left subtree: (
+{_make_str_recursively(node.left_subtree, depth + 1) if node.left_subtree is not None else None}
+{"\t" * depth})
+{"\t" * depth}right subtree: (
+{_make_str_recursively(node.right_subtree, depth + 1) if node.right_subtree is not None else None}
+{"\t" * depth})"""
+            return f"{"\t" * depth}{str(node)}"
+
+        return _make_str_recursively(self.root)
