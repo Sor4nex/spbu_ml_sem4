@@ -12,6 +12,8 @@ class KNNClassifier:
         self.targets = {}
 
     def fit(self, train_data: np.ndarray, targets: np.array) -> None:
+        if len(train_data) == 0:
+            raise ValueError("empty array given")
         if len(train_data) != len(targets):
             raise ValueError("number of points doesnt match the number of classes")
 
