@@ -5,16 +5,16 @@ import numpy as np
 from math import floor
 
 
-def train_test_split(data: np.ndarray, targets: np.array, coef: float = 0.2) -> tuple:
+def train_test_split(data: np.ndarray, targets: np.array, test_size: float = 0.2) -> tuple:
     if len(data) != len(targets):
         raise ValueError("number of points doesnt match the number of classes")
 
-    if coef == 1.0:
+    if test_size == 1.0:
         return [], [], data, targets
-    elif coef == 0.0:
+    elif test_size == 0.0:
         return data, targets, [], []
 
-    ind = floor(len(data) * (1 - coef))
+    ind = floor(len(data) * (1 - test_size))
     # return x_train, y_train, x_test, y_test
     return data[:ind], targets[:ind], data[ind:], targets[ind:]
 
