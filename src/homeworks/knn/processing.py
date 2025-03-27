@@ -1,11 +1,13 @@
 import abc
+from math import floor
 from typing import Union
 
 import numpy as np
-from math import floor
 
 
-def train_test_split(data: np.ndarray, targets: np.array, test_size: float = 0.2) -> tuple:
+def train_test_split(
+    data: np.ndarray, targets: np.ndarray, test_size: float = 0.2
+) -> tuple:
     if len(data) != len(targets):
         raise ValueError("number of points doesnt match the number of classes")
 
@@ -28,15 +30,17 @@ class Scaler(metaclass=abc.ABCMeta):
     def transform(self, transform_data: np.ndarray) -> np.ndarray:
         raise NotImplementedError()
 
-    def fit_transform(self, train_data: np.ndarray, transform_data: np.ndarray) -> np.ndarray:
+    def fit_transform(
+        self, train_data: np.ndarray, transform_data: np.ndarray
+    ) -> np.ndarray:
         self.fit(train_data)
         return self.transform(transform_data)
 
 
 class MinMaxScaler(Scaler):
     def __init__(self):
-        self. x_min: Union[np.array, None] = None
-        self. x_max: Union[np.array, None] = None
+        self.x_min: Union[np.ndarray, None] = None
+        self.x_max: Union[np.ndarray, None] = None
 
     def fit(self, train_data: np.ndarray) -> None:
         mins, maxs = [], []
@@ -46,11 +50,11 @@ class MinMaxScaler(Scaler):
             mins.append(column_min)
             maxs.append(column_max)
 
-        self.x_min = mins
-        self.x_max = maxs
+        self.x_min = np.array(mins)
+        self.x_max = np.array(maxs)
 
     def transform(self, transform_data: np.ndarray) -> np.ndarray:
-        if self.x_min is None and self.x_max is None:
+        if self.x_min is None or self.x_max is None:
             raise AttributeError("scaler was not fit with data")
 
         transform_data = transform_data.copy()
@@ -59,14 +63,16 @@ class MinMaxScaler(Scaler):
                 if self.x_max[coordinate] == self.x_min[coordinate]:
                     point[coordinate] = 0.0
                     continue
-                point[coordinate] = (point[coordinate] - self.x_min[coordinate]) / (self.x_max[coordinate] - self.x_min[coordinate])
+                point[coordinate] = (point[coordinate] - self.x_min[coordinate]) / (
+                    self.x_max[coordinate] - self.x_min[coordinate]
+                )
 
         return transform_data
 
 
 class MaxAbsScaler(Scaler):
     def __init__(self):
-        self.x_max_abs: Union[np.array, None] = None
+        self.x_max_abs: Union[np.ndarray, None] = None
 
     def fit(self, train_data: np.ndarray) -> None:
         max_abs = []
@@ -74,7 +80,7 @@ class MaxAbsScaler(Scaler):
             column_max = float(np.max(np.absolute(train_data[:, column])))
             max_abs.append(abs(column_max))
 
-        self.x_max_abs = max_abs
+        self.x_max_abs = np.array(max_abs)
 
     def transform(self, transform_data: np.ndarray) -> np.ndarray:
         if self.x_max_abs is None:
@@ -95,25 +101,29 @@ class Metrics:
     @staticmethod
     def accuracy(y_pred: np.ndarray, y_true: np.ndarray) -> float:
         if len(y_pred) != len(y_true):
-            raise ValueError("length of prediction vector doesnt match the length of true values vector")
+            raise ValueError(
+                "length of prediction vector doesnt match the length of true values vector"
+            )
 
         tp = 0
         for i in range(len(y_pred)):
             tp += int(y_pred[i] == y_true[i])
 
-        return tp/len(y_pred)
+        return tp / len(y_pred)
 
     @staticmethod
     def f1_score(y_pred: np.ndarray, y_true: np.ndarray) -> float:
-            if len(y_pred) != len(y_true):
-                raise ValueError("length of prediction vector doesnt match the length of true values vector")
+        if len(y_pred) != len(y_true):
+            raise ValueError(
+                "length of prediction vector doesnt match the length of true values vector"
+            )
 
-            tp = fp = fn = 0
-            for i in range(len(y_pred)):
-                if y_true[i] == 1:
-                    tp += int(y_true[i] == y_pred[i])
-                    fn += int(y_true[i] != y_pred[i])
-                    continue
-                fp += int(y_true[i] != y_pred[i])
+        tp = fp = fn = 0
+        for i in range(len(y_pred)):
+            if y_true[i] == 1:
+                tp += int(y_true[i] == y_pred[i])
+                fn += int(y_true[i] != y_pred[i])
+                continue
+            fp += int(y_true[i] != y_pred[i])
 
-            return (2 * tp) / (2 * tp + fp + fn)
+        return (2 * tp) / (2 * tp + fp + fn)

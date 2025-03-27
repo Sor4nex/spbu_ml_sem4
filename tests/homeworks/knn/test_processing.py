@@ -1,21 +1,24 @@
-import pytest
-
-
 import numpy as np
 import pytest
+
 from src.homeworks.knn.processing import *
 
+
 # Тесты для функции accuracy
-@pytest.mark.parametrize("y_pred, y_true, expected", [
-    # Идеальное совпадение
-    (np.array([1, 0, 1, 0]), np.array([1, 0, 1, 0]), 1.0),
-    # Все предсказания неверны
-    (np.array([1, 1, 1, 1]), np.array([0, 0, 0, 0]), 0.0),
-    # Часть предсказаний верна
-    (np.array([1, 0, 1, 0]), np.array([1, 0, 0, 0]), 0.75),
-])
+@pytest.mark.parametrize(
+    "y_pred, y_true, expected",
+    [
+        # Идеальное совпадение
+        (np.array([1, 0, 1, 0]), np.array([1, 0, 1, 0]), 1.0),
+        # Все предсказания неверны
+        (np.array([1, 1, 1, 1]), np.array([0, 0, 0, 0]), 0.0),
+        # Часть предсказаний верна
+        (np.array([1, 0, 1, 0]), np.array([1, 0, 0, 0]), 0.75),
+    ],
+)
 def test_accuracy(y_pred, y_true, expected):
     assert Metrics.accuracy(y_pred, y_true) == expected
+
 
 # Тест на ошибку при разных длинах массивов
 def test_accuracy_value_error():
@@ -24,21 +27,26 @@ def test_accuracy_value_error():
     with pytest.raises(ValueError):
         Metrics.accuracy(y_pred, y_true)
 
+
 # Тесты для функции f1_score
-@pytest.mark.parametrize("y_pred, y_true, expected", [
-    # Идеальное совпадение
-    (np.array([1, 0, 1, 0]), np.array([1, 0, 1, 0]), 1.0),
-    # Все предсказания неверны
-    (np.array([1, 1, 1, 1]), np.array([0, 0, 0, 0]), 0.0),
-    # Часть предсказаний верна
-    (np.array([1, 0, 1, 0]), np.array([1, 0, 0, 0]), pytest.approx(0.6666666667)),
-    # Все предсказания положительные, но не все верны
-    (np.array([1, 1, 1, 1]), np.array([1, 0, 1, 0]), pytest.approx(0.6666666667)),
-    # Все предсказания отрицательные, но не все верны
-    (np.array([0, 0, 0, 0]), np.array([1, 0, 1, 0]), 0.0),
-])
+@pytest.mark.parametrize(
+    "y_pred, y_true, expected",
+    [
+        # Идеальное совпадение
+        (np.array([1, 0, 1, 0]), np.array([1, 0, 1, 0]), 1.0),
+        # Все предсказания неверны
+        (np.array([1, 1, 1, 1]), np.array([0, 0, 0, 0]), 0.0),
+        # Часть предсказаний верна
+        (np.array([1, 0, 1, 0]), np.array([1, 0, 0, 0]), pytest.approx(0.6666666667)),
+        # Все предсказания положительные, но не все верны
+        (np.array([1, 1, 1, 1]), np.array([1, 0, 1, 0]), pytest.approx(0.6666666667)),
+        # Все предсказания отрицательные, но не все верны
+        (np.array([0, 0, 0, 0]), np.array([1, 0, 1, 0]), 0.0),
+    ],
+)
 def test_f1_score(y_pred, y_true, expected):
     assert Metrics.f1_score(y_pred, y_true) == expected
+
 
 # Тест на ошибку при разных длинах массивов
 def test_f1_score_value_error():
@@ -52,26 +60,30 @@ def test_f1_score_value_error():
 # Тесты для MinMaxScaler
 # ----------------------------
 
-@pytest.mark.parametrize("train_data, transform_data, expected", [
-    # Простой случай
-    (
+
+@pytest.mark.parametrize(
+    "train_data, transform_data, expected",
+    [
+        # Простой случай
+        (
             np.array([[1.0, 2.0], [3.0, 4.0]]),
             np.array([[2.0, 3.0]]),
-            np.array([[0.5, 0.5]])
-    ),
-    # Отрицательные значения
-    (
+            np.array([[0.5, 0.5]]),
+        ),
+        # Отрицательные значения
+        (
             np.array([[-1.0, 0.0], [1.0, 2.0]]),
             np.array([[0.0, 1.0]]),
-            np.array([[0.5, 0.5]])
-    ),
-    # Одна колонка с одинаковыми значениями (вызовет деление на 0)
-    (
+            np.array([[0.5, 0.5]]),
+        ),
+        # Одна колонка с одинаковыми значениями (вызовет деление на 0)
+        (
             np.array([[2.0, 5.0], [2.0, 6.0]]),
             np.array([[2.0, 5.0]]),
-            np.array([[0.0, 0.0]])  # Ожидаем ошибку, но пример для демонстрации
-    ),
-])
+            np.array([[0.0, 0.0]]),  # Ожидаем ошибку, но пример для демонстрации
+        ),
+    ],
+)
 def test_minmax_scaler(train_data, transform_data, expected):
     scaler = MinMaxScaler()
     scaler.fit(train_data)
@@ -92,26 +104,30 @@ def test_minmax_scaler_error():
 # Тесты для MaxAbsScaler
 # ----------------------------
 
-@pytest.mark.parametrize("train_data, transform_data, expected", [
-    # Простой случай
-    (
+
+@pytest.mark.parametrize(
+    "train_data, transform_data, expected",
+    [
+        # Простой случай
+        (
             np.array([[1.0, 2.0], [3.0, 4.0]]),
             np.array([[3.0, 4.0]]),
-            np.array([[1.0, 1.0]])
-    ),
-    # Отрицательные значения
-    (
+            np.array([[1.0, 1.0]]),
+        ),
+        # Отрицательные значения
+        (
             np.array([[-2.0, 3.0], [4.0, -6.0]]),
             np.array([[-2.0, 3.0]]),
-            np.array([[-0.5, 0.5]])
-    ),
-    # Нулевые значения
-    (
+            np.array([[-0.5, 0.5]]),
+        ),
+        # Нулевые значения
+        (
             np.array([[0.0, 0.0], [0.0, 0.0]]),
             np.array([[0.0, 0.0]]),
-            np.array([[0.0, 0.0]])  # Вызовет деление на 0
-    ),
-])
+            np.array([[0.0, 0.0]]),  # Вызовет деление на 0
+        ),
+    ],
+)
 def test_maxabs_scaler(train_data, transform_data, expected):
     scaler = MaxAbsScaler()
     scaler.fit(train_data)
@@ -127,56 +143,59 @@ def test_maxabs_scaler_error():
 
 
 # Тесты для корректного разделения данных
-@pytest.mark.parametrize("data, targets, coef, expected", [
-    # Простой случай
-    (
+@pytest.mark.parametrize(
+    "data, targets, coef, expected",
+    [
+        # Простой случай
+        (
             np.array([[1, 2], [3, 4], [5, 6], [7, 8]]),  # data
             np.array([0, 1, 0, 1]),  # targets
             0.25,  # coef
             (
-                    np.array([[1, 2], [3, 4], [5, 6]]),  # x_train
-                    np.array([0, 1, 0]),  # y_train
-                    np.array([[7, 8]]),  # x_test
-                    np.array([1])  # y_test
-            )
-    ),
-    # coef = 0 (вся выборка становится тренировочной)
-    (
+                np.array([[1, 2], [3, 4], [5, 6]]),  # x_train
+                np.array([0, 1, 0]),  # y_train
+                np.array([[7, 8]]),  # x_test
+                np.array([1]),  # y_test
+            ),
+        ),
+        # coef = 0 (вся выборка становится тренировочной)
+        (
             np.array([[1, 2], [3, 4], [5, 6]]),
             np.array([0, 1, 0]),
             0.0,
             (
-                    np.array([[1, 2], [3, 4], [5, 6]]),
-                    np.array([0, 1, 0]),
-                    np.array([]),  # x_test пустой
-                    np.array([])  # y_test пустой
-            )
-    ),
-    # coef = 1 (вся выборка становится тестовой)
-    (
+                np.array([[1, 2], [3, 4], [5, 6]]),
+                np.array([0, 1, 0]),
+                np.array([]),  # x_test пустой
+                np.array([]),  # y_test пустой
+            ),
+        ),
+        # coef = 1 (вся выборка становится тестовой)
+        (
             np.array([[1, 2], [3, 4], [5, 6]]),
             np.array([0, 1, 0]),
             1.0,
             (
-                    np.array([]),  # x_train пустой
-                    np.array([]),  # y_train пустой
-                    np.array([[1, 2], [3, 4], [5, 6]]),
-                    np.array([0, 1, 0])
-            )
-    ),
-    # coef = 0.5 (ровно половина данных)
-    (
+                np.array([]),  # x_train пустой
+                np.array([]),  # y_train пустой
+                np.array([[1, 2], [3, 4], [5, 6]]),
+                np.array([0, 1, 0]),
+            ),
+        ),
+        # coef = 0.5 (ровно половина данных)
+        (
             np.array([[1, 2], [3, 4], [5, 6], [7, 8]]),
             np.array([0, 1, 0, 1]),
             0.5,
             (
-                    np.array([[1, 2], [3, 4]]),
-                    np.array([0, 1]),
-                    np.array([[5, 6], [7, 8]]),
-                    np.array([0, 1])
-            )
-    ),
-])
+                np.array([[1, 2], [3, 4]]),
+                np.array([0, 1]),
+                np.array([[5, 6], [7, 8]]),
+                np.array([0, 1]),
+            ),
+        ),
+    ],
+)
 def test_train_test_split(data, targets, coef, expected):
     x_train, y_train, x_test, y_test = train_test_split(data, targets, coef)
 
