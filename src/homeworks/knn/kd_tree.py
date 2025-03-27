@@ -98,18 +98,3 @@ class KDTree:
                 for point in x
             ]
         )
-
-    def __str__(self) -> str:
-        def _make_str_recursively(node: Node | np.ndarray, depth: int = 0) -> str:
-            if isinstance(node, Node):
-                return f"""{'\t' * depth}med: {node.median};
-{'\t' * depth}split: {node.split_axis};
-{'\t' * depth}left subtree: (
-{_make_str_recursively(node.left_subtree, depth + 1) if node.left_subtree is not None else None}
-{'\t' * depth})
-{'\t' * depth}right subtree: (
-{_make_str_recursively(node.right_subtree, depth + 1) if node.right_subtree is not None else None}
-{'\t' * depth})"""
-            return f"{'\t' * depth}{str(node)}"
-
-        return _make_str_recursively(self.root)
